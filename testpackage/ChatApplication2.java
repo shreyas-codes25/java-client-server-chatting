@@ -68,7 +68,7 @@ public class ChatApplication2 {
 
         frame.setVisible(true);
     }
-
+    @SuppressWarnings("all")
     private void connectToServer() {
         Thread serverThread = new Thread(() -> {
         try {
