@@ -1,41 +1,35 @@
-package testpackage;
+package applicationPackage;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
-import java.net.ServerSocket;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
-public class ChatApplication1 {
-
+public class ClientFoundation {
+    //Initialization of required elements
     private JFrame frame;
     private JTextArea chatArea;
     private JTextField messageField;
-    private DataOutputStream dataOutputStream;
-    private Socket clientSocket;
+    private DataOutputStream serverOutputStream;
+    private DataInputStream dataInputStream;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new ChatApplication1();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    public ChatApplication1() {
+    //using constructor to start the client
+    public ClientFoundation() {
         initialize();
-        startServer();
+        connectToServer();
     }
 
+    //Initializing GUI of client side
     private void initialize() {
         frame = new JFrame();
-        frame.setTitle("Server");
+        frame.setTitle("Client");
         frame.setBounds(100, 100, 450, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        
         JPanel panel = new JPanel();
         frame.getContentPane().add(panel, BorderLayout.CENTER);
         panel.setLayout(new BorderLayout(0, 0));
@@ -45,6 +39,7 @@ public class ChatApplication1 {
         JScrollPane scrollPane = new JScrollPane(chatArea);
         panel.add(scrollPane, BorderLayout.CENTER);
 
+        
         JPanel messagePanel = new JPanel();
         panel.add(messagePanel, BorderLayout.SOUTH);
         messagePanel.setLayout(new BorderLayout(0, 0));
@@ -55,46 +50,51 @@ public class ChatApplication1 {
 
         JButton sendButton = new JButton("Send");
         messagePanel.add(sendButton, BorderLayout.EAST);
-
-        // ActionListener for the send button
+        
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 sendMessage();
             }
         });
+        
 
         frame.setVisible(true);
     }
+
+    //Connecting to server and receiveing messages from server
     @SuppressWarnings("all")
-    private void startServer() {
+    private void connectToServer() {
         Thread serverThread = new Thread(() -> {
-            try {
-                ServerSocket serverSocket = new ServerSocket(6666);
-                System.out.println(serverSocket.getLocalSocketAddress());
-                clientSocket = serverSocket.accept();
-                dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
-                DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
-
-                while (true) {
-                    String receivedMessage = dataInputStream.readUTF();
-                    displayMessage("Client says: " + receivedMessage);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            Socket socket = new Socket("localhost", 6666);
+            serverOutputStream = new DataOutputStream(socket.getOutputStream());
+            dataInputStream = new DataInputStream(socket.getInputStream());
+            while (true) {
+                String receivedMessage = dataInputStream.readUTF();
+                displayMessage("Server says: " + receivedMessage);
             }
-        });
 
-        serverThread.setDaemon(true);
-        serverThread.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    });
+    serverThread.setDaemon(true);
+    serverThread.start();
     }
 
+    //send messsage to the server
     private void sendMessage() {
         String message = messageField.getText();
         if (!message.isEmpty()) {
             try {
-                dataOutputStream.writeUTF(message);
-                dataOutputStream.flush();
-                displayMessage("You: " + message);
+
+                serverOutputStream.writeUTF(message);
+                serverOutputStream.flush();
+
+
+                chatArea.append("You: " + message + "\n");
+
+
                 messageField.setText("");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -102,6 +102,7 @@ public class ChatApplication1 {
         }
     }
 
+    //Display message to the Server
     private void displayMessage(String message) {
         SwingUtilities.invokeLater(() -> chatArea.append(message + "\n"));
     }
