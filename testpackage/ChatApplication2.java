@@ -70,6 +70,7 @@ public class ChatApplication2 {
     }
 
     private void connectToServer() {
+        Thread serverThread = new Thread(() -> {
         try {
             Socket socket = new Socket("localhost", 6666);
             serverOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -82,6 +83,9 @@ public class ChatApplication2 {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    });
+    serverThread.setDaemon(true);
+    serverThread.start();
     }
 
     private void sendMessage() {
