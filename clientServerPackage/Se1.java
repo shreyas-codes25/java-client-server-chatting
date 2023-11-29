@@ -5,12 +5,14 @@ import java.io.*;
 public class Se1 {
 	Se1() {
 		try{
-			ServerSocket ss = new ServerSocket(8634);
+			
+			ServerSocket ss = new ServerSocket(6666);
+			System.out.println(ss.getLocalSocketAddress());
 			Socket s = ss.accept();
 			DataInputStream dis = new DataInputStream(s.getInputStream());
 			DataOutputStream dut = new DataOutputStream(s.getOutputStream());
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
+			
 			String s1="" , s2="" ;
 
 			while(!s1.equals("stop")) {
