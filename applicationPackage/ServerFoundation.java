@@ -64,7 +64,7 @@ public class ServerFoundation {
     private void startServer() {
         Thread serverThread = new Thread(() -> {
             try {
-                ServerSocket serverSocket = new ServerSocket(6666);
+                ServerSocket serverSocket = new ServerSocket(1234);
                 clientSocket = serverSocket.accept();
                 if(serverSocket.isBound()){
                     displayMessage("connection successful");

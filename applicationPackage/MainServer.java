@@ -1,7 +1,5 @@
 package applicationPackage;
-
 import javax.swing.SwingUtilities;
-
 public class MainServer {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -12,4 +10,4 @@ public class MainServer {
             }
         });
     }
-}
+}   
